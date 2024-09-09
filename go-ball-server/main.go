@@ -1,28 +1,31 @@
 package main
 
 import (
-	"go.uber.org/dig"
-	"github.com/mf15726/go-ball/player"
-
+	"log"
 	"net/http"
+
+	"github.com/mf15726/go-ball/controllers"
+	"github.com/mf15726/go-ball/interfaces"
+	"github.com/mf15726/go-ball/repositories"
+	"github.com/mf15726/go-ball/services"
 )
 
 func main() {
-	createContainers()
-	
-	mux := http.NewServeMux()
+	var playerController interfaces.IPlayerController
+	playerController, _, _ = createPlayerContainers()
 
-	// Register the routes and handlers
-	mux.Handle("/", &homeHandler{})
-
-	// Run the server
-	http.ListenAndServe(":8080", mux)
+	http.HandleFunc("/hello-world", playerController.HelloWorld)
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
-func createContainers() {
-	container := dig.New()
-	container.Provide(player.PlayerRepositoryInMemoryImpl)
-	container.Provide(player.PlayerServiceImpl)
+func createPlayerContainers() (interfaces.IPlayerController, interfaces.IPlayerService, interfaces.IPlayerRepository) {
+	playerRepository := repositories.PlayerRepositoryInMemoryImpl()
+	playerService := services.PlayerServiceImpl(playerRepository)
+	playerController := controllers.PlayerControllerImpl(playerService)
+	return playerController, playerService, playerRepository
 }
 
-func 
+func createPlayerEndpoints(playerController interfaces.IPlayerController) {
+	http.HandleFunc("/hello-world", playerController.HelloWorld)
+	// http.HandleFunc("/player/create", playerController.CreatePlayer)
+}
