@@ -27,5 +27,6 @@ func createPlayerContainers() (interfaces.IPlayerController, interfaces.IPlayerS
 
 func createPlayerEndpoints(playerController interfaces.IPlayerController) {
 	http.HandleFunc("/hello-world", playerController.HelloWorld)
+	http.HandleFunc("/hello-world", playerController.HelloWorld)
 	// http.HandleFunc("/player/create", playerController.CreatePlayer)
 }
